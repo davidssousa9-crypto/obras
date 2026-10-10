@@ -1,0 +1,6 @@
+# Dev tooling — never part of the client deliverable
+node_modules/
+ms-playwright/
+playwright-report/
+test-results/
+*.log
