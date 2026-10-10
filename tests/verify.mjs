@@ -549,22 +549,27 @@ export async function quotesStageEntrance(ctx) {
  * (filename without extension). Each entry is an array of async check
  * functions receiving the same ctx as base checks. Example:
  *
- *   PAGE_CHECKS['projects'] = [filterWorks, activeNavStated];
- *   PAGE_CHECKS['contact'] = [formValidates, activeNavStated];
- *   PAGE_CHECKS['project'] = [rendersDetail, activeNavStated];
+ *   PAGE_CHECKS['projects'] = [filterWorks, ...SHELL_CHECKS];
+ *   PAGE_CHECKS['contact'] = [formValidates, ...SHELL_CHECKS];
+ *   PAGE_CHECKS['project'] = [rendersDetail, ...SHELL_CHECKS];
  *
- * activeNavStated is page-agnostic — include it in every page's entry so the
- * shell protocol is verified on every page.
+ * SHELL_CHECKS is the shared spread every keyed page receives: the page-load
+ * curtain protocol and the active-nav protocol are page-agnostic, so no page
+ * entry ever duplicates the base checks (consoleClean, noOverflow,
+ * entrancesOnce, reducedMotionStatic, noGsapStillRenders) — those run for
+ * every existing page automatically.
  */
+const SHELL_CHECKS = [curtainOnce, activeNavStated];
+
 export const PAGE_CHECKS = {};
 PAGE_CHECKS['index'] = [
-  curtainOnce,
-  activeNavStated,
+  ...SHELL_CHECKS,
   marqueeReactive,
   srvEntranceOnce,
   projectParallax,
   quotesStageEntrance,
 ];
+PAGE_CHECKS['about'] = [...SHELL_CHECKS];
 
 /* ------------------------- runner ------------------------- */
 
