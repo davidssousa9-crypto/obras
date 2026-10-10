@@ -305,9 +305,82 @@
     }
   }
 
+  /* ---------- Marquee — velocity-reactive duration (home) ---------- */
+  // Reads Lenis velocity on scroll and writes `--marquee-duration` to <html>;
+  // CSS keeps animating the track via animation-duration. Never tweens layout.
+  function initMarqueeVelocity() {
+    if (reduced) return; // reduced motion: static marquee, no velocity wiring
+    var lenis = window.__lenis;
+    if (!lenis || typeof lenis.on !== 'function') return;
+    if (!document.querySelector('.marquee__track')) return;
+    var root = document.documentElement;
+    lenis.on('scroll', function (e) {
+      var v = 0;
+      if (e && typeof e.velocity === 'number') v = Math.abs(e.velocity);
+      else if (typeof lenis.velocity === 'number') v = Math.abs(lenis.velocity);
+      var dur = Math.max(20, Math.min(70, 44 / (1 + v)));
+      root.style.setProperty('--marquee-duration', dur.toFixed(2) + 's');
+    });
+  }
+
+  /* ---------- Services — grouped entrance (home) ---------- */
+  // Rows rise as a group on the section trigger; the index number fades in
+  // separately. one-way (once:true) so entrances never replay on scroll-back.
+  function initSrvEntrance() {
+    if (!hasGSAP || reduced) return;
+    var items = gsap.utils.toArray('[data-srv]');
+    if (!items.length) return;
+    var trigger = document.querySelector('[data-services]');
+    if (!trigger) return;
+
+    gsap.fromTo(items, { y: 44, autoAlpha: 0 }, {
+      y: 0, autoAlpha: 1, duration: 0.9, ease: 'power3.out', stagger: 0.1,
+      scrollTrigger: { trigger: trigger, start: 'top 78%', once: true }
+    });
+
+    var indexes = gsap.utils.toArray('[data-srv] .srv__index');
+    if (indexes.length) {
+      gsap.fromTo(indexes, { autoAlpha: 0, y: 14 }, {
+        autoAlpha: 1, y: 0, duration: 0.6, ease: 'power3.out', delay: 0.35,
+        scrollTrigger: { trigger: trigger, start: 'top 78%', once: true }
+      });
+    }
+  }
+
+  /* ---------- Projects — inner image parallax scrub (home + projects) ---------- */
+  // Non-layout-affecting scrub: shifts the inner img (yPercent ±6) inside the
+  // overflow-hidden wrapper, baked under a scale so no edges show. Skipped when
+  // reduced — no transform is left on the img.
+  function initProjectParallax() {
+    if (!hasGSAP || reduced) return;
+    gsap.utils.toArray('[data-parallax]').forEach(function (el) {
+      var img = el.querySelector('img');
+      if (!img) return;
+      gsap.fromTo(img, { yPercent: -6, scale: 1.12 }, {
+        yPercent: 6, ease: 'none',
+        scrollTrigger: { trigger: el, start: 'top bottom', end: 'bottom top', scrub: true }
+      });
+    });
+  }
+
+  /* ---------- Quotes stage — entrance (home) ---------- */
+  function initQuotesReveal() {
+    if (!hasGSAP || reduced) return;
+    var stage = document.querySelector('.quotes__stage');
+    if (!stage) return;
+    gsap.fromTo(stage, { y: 48, autoAlpha: 0 }, {
+      y: 0, autoAlpha: 1, duration: 1, ease: 'power3.out',
+      scrollTrigger: { trigger: stage, start: 'top 88%', once: true }
+    });
+  }
+
   /* ---------- Boot ---------- */
   initPageLoad(); // curtain up while the hero lines rise
   initReveals();
+  initMarqueeVelocity();
+  initSrvEntrance();
+  initProjectParallax();
+  initQuotesReveal();
   initActiveNav();
   initMagnetic();
   initServices();

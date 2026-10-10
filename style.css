@@ -465,6 +465,7 @@ html.lenis, html.lenis body { height: auto; }
   display: flex;
   width: max-content;
   animation: marquee-scroll 44s linear infinite;
+  animation-duration: var(--marquee-duration, 44s);
 }
 .marquee__viewport:hover .marquee__track { animation-play-state: paused; }
 .marquee__group {

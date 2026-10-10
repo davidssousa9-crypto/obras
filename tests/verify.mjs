@@ -347,6 +347,201 @@ export async function activeNavStated(ctx) {
   }
 }
 
+/* ------------------------- home (index) checks ------------------------- */
+
+/**
+ * marqueeReactive — the marquee's CSS animation duration must be driven by
+ * Lenis velocity: `--marquee-duration` on <html> stays empty until the page
+ * scrolls, then is written and changes with velocity. The check samples the
+ * custom property across a synthetic Lenis scroll. Fails before
+ * initMarqueeVelocity lands (property never set).
+ */
+export async function marqueeReactive(ctx) {
+  const page = await ctx.openPage();
+  try {
+    await page.goto(ctx.url, { waitUntil: 'load', timeout: 30000 });
+    await page.waitForTimeout(700);
+
+    const hasLenis = await page.evaluate(
+      () => !!(window.__lenis && typeof window.__lenis.scrollTo === 'function')
+    );
+    if (!hasLenis) throw new Error('window.__lenis absent — velocity-reactive marquee cannot run');
+
+    const before = await page.evaluate(() =>
+      getComputedStyle(document.documentElement).getPropertyValue('--marquee-duration').trim()
+    );
+
+    await page.evaluate(() => {
+      window.__mqSamples = [];
+      window.__mqId = setInterval(() => {
+        window.__mqSamples.push(
+          getComputedStyle(document.documentElement).getPropertyValue('--marquee-duration').trim()
+        );
+      }, 40);
+      window.__lenis.scrollTo(window.innerHeight * 2, { duration: 0.8 });
+    });
+    await page.waitForTimeout(500);
+
+    const samples = await page.evaluate(() => {
+      clearInterval(window.__mqId);
+      return window.__mqSamples;
+    });
+
+    const seen = Array.from(new Set(samples.filter(Boolean)));
+    if (!seen.length) throw new Error('--marquee-duration never set during scroll');
+    if (seen.every((v) => v === before)) {
+      throw new Error(`--marquee-duration never deviated from "${before || '(empty)'}"`);
+    }
+  } finally {
+    await page.close();
+  }
+}
+
+/**
+ * srvEntranceOnce — the four service rows must run their one-way entrance:
+ * after the standard bottom→top scroll pass each `.srv` is fully opaque AND
+ * carries a GSAP inline transform (proof the tween ran, not just default
+ * visibility). Fails before initSrvEntrance lands.
+ */
+export async function srvEntranceOnce(ctx) {
+  const page = await ctx.openPage();
+  try {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(ctx.url, { waitUntil: 'load', timeout: 30000 });
+    await page.waitForTimeout(1600);
+
+    const count = await page.evaluate(() => document.querySelectorAll('[data-srv]').length);
+    if (!count) throw new Error('[data-srv] elements not found');
+
+    await scrollToBottom(page);
+    await page.waitForTimeout(1200);
+    await scrollToTop(page);
+    await page.waitForTimeout(600);
+
+    const result = await page.evaluate(() =>
+      Array.from(document.querySelectorAll('[data-srv]')).map((el) => ({
+        opacity: parseFloat(getComputedStyle(el).opacity),
+        inline: !!el.style.transform,
+      }))
+    );
+
+    const failures = [];
+    result.forEach((r, i) => {
+      if (!(r.opacity >= 0.99)) failures.push(`[${i}] opacity=${r.opacity}`);
+      if (!r.inline) failures.push(`[${i}] no GSAP transform (entrance did not run)`);
+    });
+    if (failures.length) throw new Error(failures.join('; '));
+  } finally {
+    await page.close();
+  }
+}
+
+/**
+ * projectParallax — each `[data-project] [data-parallax]` wraps its img in an
+ * overflow-hidden scrub: after scrolling so the card passes the viewport top
+ * the img carries an inline transform with a non-zero translateY. Under
+ * reduced motion no inline transform is left on the img.
+ */
+export async function projectParallax(ctx) {
+  const page = await ctx.openPage();
+  try {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(ctx.url, { waitUntil: 'load', timeout: 30000 });
+    await page.waitForTimeout(1200);
+
+    const hasTarget = await page.evaluate(
+      () => !!document.querySelector('[data-project] [data-parallax]')
+    );
+    if (!hasTarget) throw new Error('[data-project] [data-parallax] not found');
+
+    await scrollToBottom(page);
+    await page.waitForTimeout(1000);
+
+    const active = await page.evaluate(() => {
+      const wrap = document.querySelector('[data-project] [data-parallax]');
+      const img = wrap ? wrap.querySelector('img') : null;
+      if (!img) return { found: false };
+      const inline = img.style.transform || '';
+      let ty = 0;
+      try {
+        // GSAP emits e.g. "translate(0%, 6%) scale(1.12, 1.12)"; DOMMatrix
+        // cannot resolve translate() percentages, so read the y token and
+        // resolve % against the img's own height (CSS translate-y % is
+        // relative to the element's height).
+        const m = /translate(?:3d)?\(([^)]*)\)/.exec(inline);
+        if (m) {
+          const parts = m[1].split(',').map((s) => s.trim());
+          const yv = parts.length >= 2 ? parts[1] : '';
+          if (yv.endsWith('%')) ty = (parseFloat(yv) / 100) * img.offsetHeight;
+          else if (Number.isFinite(parseFloat(yv))) ty = parseFloat(yv);
+        } else {
+          ty = new DOMMatrixReadOnly(inline || 'none').m42;
+        }
+      } catch { ty = 0; }
+      return { found: true, inline, ty };
+    });
+
+    if (!active.found) throw new Error('[data-project] [data-parallax] img not found');
+    if (!active.inline || Math.abs(active.ty) < 0.5) {
+      throw new Error(`parallax inactive: inline transform "${active.inline}" translateY=${active.ty}`);
+    }
+  } finally {
+    await page.close();
+  }
+
+  const rp = await ctx.openPage({ reducedMotion: true });
+  try {
+    await rp.setViewportSize({ width: 1440, height: 900 });
+    await rp.goto(ctx.url, { waitUntil: 'load', timeout: 30000 });
+    await rp.waitForTimeout(600);
+    await scrollToBottom(rp);
+    await rp.waitForTimeout(800);
+    const still = await rp.evaluate(() => {
+      const wrap = document.querySelector('[data-project] [data-parallax]');
+      const img = wrap ? wrap.querySelector('img') : null;
+      return img ? (img.style.transform || '') : 'missing';
+    });
+    if (still === 'missing') throw new Error('[data-project] [data-parallax] img not found (reduced)');
+    if (still) throw new Error(`reduced motion: parallax left inline transform "${still}"`);
+  } finally {
+    await rp.close();
+  }
+}
+
+/**
+ * quotesStageEntrance — `.quotes__stage` must run its one-way entrance: fully
+ * opaque AND carrying a GSAP inline transform after the bottom→top scroll pass.
+ * Fails before initQuotesReveal lands.
+ */
+export async function quotesStageEntrance(ctx) {
+  const page = await ctx.openPage();
+  try {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(ctx.url, { waitUntil: 'load', timeout: 30000 });
+    await page.waitForTimeout(1600);
+
+    const has = await page.evaluate(() => !!document.querySelector('.quotes__stage'));
+    if (!has) throw new Error('.quotes__stage not found');
+
+    await scrollToBottom(page);
+    await page.waitForTimeout(1200);
+    await scrollToTop(page);
+    await page.waitForTimeout(600);
+
+    const r = await page.evaluate(() => {
+      const el = document.querySelector('.quotes__stage');
+      return { opacity: parseFloat(getComputedStyle(el).opacity), inline: !!el.style.transform };
+    });
+
+    const failures = [];
+    if (!(r.opacity >= 0.99)) failures.push(`opacity=${r.opacity}`);
+    if (!r.inline) failures.push('no GSAP transform (entrance did not run)');
+    if (failures.length) throw new Error(failures.join('; '));
+  } finally {
+    await page.close();
+  }
+}
+
 /* ------------------------- per-page check registry ------------------------- */
 
 /**
@@ -362,7 +557,14 @@ export async function activeNavStated(ctx) {
  * shell protocol is verified on every page.
  */
 export const PAGE_CHECKS = {};
-PAGE_CHECKS['index'] = [curtainOnce, activeNavStated];
+PAGE_CHECKS['index'] = [
+  curtainOnce,
+  activeNavStated,
+  marqueeReactive,
+  srvEntranceOnce,
+  projectParallax,
+  quotesStageEntrance,
+];
 
 /* ------------------------- runner ------------------------- */
 
