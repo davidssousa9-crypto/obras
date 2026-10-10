@@ -19,10 +19,11 @@
 
   <script>document.documentElement.classList.remove('no-js');document.documentElement.classList.add('js');</script>
 </head>
-<body>
+<body data-page="home">
 
   <div class="grain" aria-hidden="true"></div>
   <div class="progress" data-progress aria-hidden="true"><span class="progress__bar" data-progress-bar></span></div>
+  <div class="curtain" data-curtain aria-hidden="true"></div>
 
   <!-- ============ HEADER ============ -->
   <header class="header" data-header>
@@ -32,11 +33,12 @@
 
     <nav class="nav" aria-label="Primary">
       <ul class="nav__list">
-        <li><a class="nav__link" href="#about"><span>About</span></a></li>
-        <li><a class="nav__link" href="#services"><span>Services</span></a></li>
-        <li><a class="nav__link" href="#projects"><span>Projects</span></a></li>
-        <li><a class="nav__link" href="#careers"><span>Careers</span></a></li>
-        <li><a class="nav__link" href="#contact"><span>Contact</span></a></li>
+        <li><a class="nav__link" data-nav="about" href="about.html"><span>About</span></a></li>
+        <li><a class="nav__link" data-nav="services" href="services.html"><span>Services</span></a></li>
+        <li><a class="nav__link" data-nav="projects" href="projects.html"><span>Projects</span></a></li>
+        <li><a class="nav__link" data-nav="news" href="news.html"><span>News</span></a></li>
+        <li><a class="nav__link" data-nav="careers" href="careers.html"><span>Careers</span></a></li>
+        <li><a class="nav__link" data-nav="contact" href="contact.html"><span>Contact</span></a></li>
       </ul>
     </nav>
 
@@ -54,11 +56,12 @@
   <div class="menu" id="mobile-menu" data-menu aria-hidden="true">
     <nav class="menu__nav" aria-label="Mobile">
       <ul class="menu__list">
-        <li><a class="menu__link" href="#about"><span class="menu__index">01</span><span class="menu__word">About</span></a></li>
-        <li><a class="menu__link" href="#services"><span class="menu__index">02</span><span class="menu__word">Services</span></a></li>
-        <li><a class="menu__link" href="#projects"><span class="menu__index">03</span><span class="menu__word">Projects</span></a></li>
-        <li><a class="menu__link" href="#careers"><span class="menu__index">04</span><span class="menu__word">Careers</span></a></li>
-        <li><a class="menu__link" href="#contact"><span class="menu__index">05</span><span class="menu__word">Contact</span></a></li>
+        <li><a class="menu__link" data-nav="about" href="about.html"><span class="menu__index">01</span><span class="menu__word">About</span></a></li>
+        <li><a class="menu__link" data-nav="services" href="services.html"><span class="menu__index">02</span><span class="menu__word">Services</span></a></li>
+        <li><a class="menu__link" data-nav="projects" href="projects.html"><span class="menu__index">03</span><span class="menu__word">Projects</span></a></li>
+        <li><a class="menu__link" data-nav="news" href="news.html"><span class="menu__index">04</span><span class="menu__word">News</span></a></li>
+        <li><a class="menu__link" data-nav="careers" href="careers.html"><span class="menu__index">05</span><span class="menu__word">Careers</span></a></li>
+        <li><a class="menu__link" data-nav="contact" href="contact.html"><span class="menu__index">06</span><span class="menu__word">Contact</span></a></li>
       </ul>
     </nav>
     <div class="menu__foot">
@@ -429,7 +432,7 @@
         </h2>
         <div class="footer__cta" data-fade>
           <p>We're hiring operators, engineers and superintendents who take the work seriously.</p>
-          <a class="btn btn--solid btn--lg" href="#contact" data-magnetic>
+          <a class="btn btn--solid btn--lg" href="careers.html" data-magnetic>
             <span>See open roles</span>
             <span class="btn__arrow" aria-hidden="true">↗</span>
           </a>
@@ -440,38 +443,38 @@
         <div class="footer__col">
           <h3 class="footer__col-title">Company</h3>
           <ul>
-            <li><a href="#about">About</a></li>
-            <li><a href="#projects">Projects</a></li>
-            <li><a href="#careers">Careers</a></li>
-            <li><a href="#">News</a></li>
+            <li><a href="about.html"><span>About</span></a></li>
+            <li><a href="projects.html"><span>Projects</span></a></li>
+            <li><a href="careers.html"><span>Careers</span></a></li>
+            <li><a href="news.html"><span>News</span></a></li>
           </ul>
         </div>
         <div class="footer__col">
           <h3 class="footer__col-title">Services</h3>
           <ul>
-            <li><a href="#services">Earthworks</a></li>
-            <li><a href="#services">Utilities</a></li>
-            <li><a href="#services">Roadworks</a></li>
-            <li><a href="#services">Environmental</a></li>
+            <li><a href="services.html#earthworks"><span>Earthworks</span></a></li>
+            <li><a href="services.html#utilities"><span>Utilities</span></a></li>
+            <li><a href="services.html#roadworks"><span>Roadworks</span></a></li>
+            <li><a href="services.html#environmental"><span>Environmental</span></a></li>
           </ul>
         </div>
         <div class="footer__col">
           <h3 class="footer__col-title">Resources</h3>
           <ul>
-            <li><a href="#">Safety &amp; HSE</a></li>
-            <li><a href="#">Prequalification</a></li>
-            <li><a href="#">Case studies</a></li>
-            <li><a href="#">Supplier portal</a></li>
+            <li><a href="#"><span>Safety &amp; HSE</span></a></li>
+            <li><a href="#"><span>Prequalification</span></a></li>
+            <li><a href="#"><span>Case studies</span></a></li>
+            <li><a href="#"><span>Supplier portal</span></a></li>
           </ul>
         </div>
         <div class="footer__col footer__col--contact">
           <h3 class="footer__col-title">Contact</h3>
           <ul>
-            <li><a href="mailto:hello@metriccivil.ca">hello@metriccivil.ca</a></li>
-            <li><a href="tel:+16045550175">+1 (604) 555-0175</a></li>
-            <li>1800 Ontario St, Vancouver BC</li>
-            <li>42 Bellamy Rd N, Scarborough ON</li>
-            <li>855 4th Ave SW, Calgary AB</li>
+            <li><a href="mailto:hello@metriccivil.ca"><span>hello@metriccivil.ca</span></a></li>
+            <li><a href="tel:+16045550175"><span>+1 (604) 555-0175</span></a></li>
+            <li><a href="contact.html#vancouver"><span>1800 Ontario St, Vancouver BC</span></a></li>
+            <li><a href="contact.html#scarborough"><span>42 Bellamy Rd N, Scarborough ON</span></a></li>
+            <li><a href="contact.html#calgary"><span>855 4th Ave SW, Calgary AB</span></a></li>
           </ul>
         </div>
       </div>

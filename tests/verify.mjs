@@ -248,6 +248,83 @@ export async function noGsapStillRenders(ctx) {
   }
 }
 
+/* ------------------------- shell checks (shared) ------------------------- */
+
+/**
+ * curtainOnce — the page-load curtain must exist (presence assertion, so the
+ * check fails before the shell lands) and must be gone ~1800ms after load
+ * (initPageLoad reveals it, wipes it up, then sets display:none on complete;
+ * it stays display:none by default when GSAP is absent / motion reduced).
+ */
+export async function curtainOnce(ctx) {
+  const page = await ctx.openPage();
+  try {
+    await page.goto(ctx.url, { waitUntil: 'load', timeout: 30000 });
+    const exists = await page.evaluate(() => !!document.querySelector('[data-curtain]'));
+    if (!exists) throw new Error('[data-curtain] element not found');
+    await page.waitForTimeout(1800);
+    const stillShown = await page.evaluate(() => {
+      const el = document.querySelector('[data-curtain]');
+      if (!el) return false;
+      return getComputedStyle(el).display !== 'none';
+    });
+    if (stillShown) throw new Error('curtain still visible ~1800ms after load');
+  } finally {
+    await page.close();
+  }
+}
+
+/**
+ * activeNavStated — runs for any page in the registry. Asserts the shell's
+ * active-nav protocol: <body data-page> present, every [data-nav] link has a
+ * non-empty data-nav value and an href ending in .html, exactly the links for
+ * the current page carry .is-active, and home carries none.
+ */
+export async function activeNavStated(ctx) {
+  const page = await ctx.openPage();
+  try {
+    await page.goto(ctx.url, { waitUntil: 'load', timeout: 30000 });
+    await page.waitForTimeout(250);
+    const r = await page.evaluate(() => {
+      const body = document.body;
+      const dataPage = (body && body.dataset ? body.dataset.page : '') || '';
+      const navs = Array.from(document.querySelectorAll('[data-nav]'));
+      const bad = [];
+      navs.forEach((el, i) => {
+        const v = el.getAttribute('data-nav');
+        const href = el.getAttribute('href') || '';
+        if (!v) bad.push('[data-nav][' + i + '] empty data-nav');
+        if (!/\.html$/.test(href)) bad.push('[data-nav][' + i + '] href "' + href + '" does not end in .html');
+      });
+      const active = navs.filter((el) => el.classList.contains('is-active'));
+      return {
+        dataPage: dataPage,
+        count: navs.length,
+        bad: bad,
+        activeCount: active.length,
+        activeMatching: active.filter((el) => el.getAttribute('data-nav') === dataPage).length,
+        activeWrong: active
+          .filter((el) => el.getAttribute('data-nav') !== dataPage)
+          .map((el) => el.getAttribute('data-nav')),
+      };
+    });
+
+    const failures = [];
+    if (!r.dataPage) failures.push('document.body[data-page] missing');
+    if (r.count === 0) failures.push('no [data-nav] links found');
+    if (r.bad.length) failures.push(r.bad.join('; '));
+    if (r.dataPage === 'home') {
+      if (r.activeCount !== 0) failures.push(`home: ${r.activeCount} active nav link(s), expected none`);
+    } else if (r.dataPage) {
+      if (r.activeMatching === 0) failures.push(`no active [data-nav] for data-page "${r.dataPage}"`);
+      if (r.activeWrong.length) failures.push(`non-matching active link(s): ${r.activeWrong.join(', ')}`);
+    }
+    if (failures.length) throw new Error(failures.join('; '));
+  } finally {
+    await page.close();
+  }
+}
+
 /* ------------------------- per-page check registry ------------------------- */
 
 /**
@@ -255,11 +332,15 @@ export async function noGsapStillRenders(ctx) {
  * (filename without extension). Each entry is an array of async check
  * functions receiving the same ctx as base checks. Example:
  *
- *   PAGE_CHECKS['projects'] = [filterWorks];
- *   PAGE_CHECKS['contact'] = [formValidates];
- *   PAGE_CHECKS['project'] = [rendersDetail];
+ *   PAGE_CHECKS['projects'] = [filterWorks, activeNavStated];
+ *   PAGE_CHECKS['contact'] = [formValidates, activeNavStated];
+ *   PAGE_CHECKS['project'] = [rendersDetail, activeNavStated];
+ *
+ * activeNavStated is page-agnostic — include it in every page's entry so the
+ * shell protocol is verified on every page.
  */
 export const PAGE_CHECKS = {};
+PAGE_CHECKS['index'] = [curtainOnce, activeNavStated];
 
 /* ------------------------- runner ------------------------- */
 

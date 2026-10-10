@@ -939,4 +939,104 @@ html.lenis, html.lenis body { height: auto; }
   }
   .marquee__track { animation: none; }
   .hero__scroll-line { animation: none; transform: scaleX(1); opacity: 1; }
+  .curtain { display: none !important; }
+}
+
+/* ---------- 18. PAGE SHELL ---------- */
+
+/* Page-load curtain. Hidden by default; initPageLoad reveals it inline only
+   when GSAP is present and motion is not reduced, wipes it up, then hides it.
+   Keeps the page readable if the GSAP CDN never arrives. */
+.curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  background: var(--ink);
+  display: none;
+}
+
+/* Active nav state — matches <body data-page> */
+.nav__link.is-active { color: var(--bone); }
+.nav__link.is-active span::after { transform: scaleX(1); }
+.menu__link.is-active .menu__word {
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.1em;
+}
+
+/* Tighten the desktop nav before the burger breakpoint so 6 links don't crowd */
+@media (max-width: 1120px) {
+  .nav__list { gap: clamp(1.5rem, 2.4vw, 2.4rem); }
+}
+
+/* Sixth mobile menu entry (nav is 6 links) */
+.menu__list li:nth-child(6) .menu__word { transition-delay: 0.36s; }
+
+/* Inner-page hero component */
+.page-hero {
+  position: relative;
+  background: var(--bg);
+  padding-top: clamp(7.5rem, 13vh, 10rem);
+  padding-bottom: clamp(2.5rem, 6vw, 4.5rem);
+  border-bottom: 1px solid var(--line);
+}
+.page-hero__title {
+  margin-top: clamp(1rem, 3vh, 2rem);
+  font-size: clamp(2.4rem, 8.5vw, 7.5rem);
+  font-variation-settings: "wdth" 124, "wght" 840;
+}
+.page-hero__meta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.5rem;
+  margin-top: clamp(2rem, 4.5vw, 3.5rem);
+  padding-top: clamp(1rem, 2vw, 1.5rem);
+  border-top: 1px solid var(--line);
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+}
+.page-hero__crumb {
+  position: relative;
+  display: inline-block;
+  color: var(--accent);
+  transition: color 0.3s ease;
+}
+.page-hero__crumb::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.45s var(--ease-out);
+}
+.page-hero__crumb:hover { color: var(--bone); }
+.page-hero__crumb:hover::after { transform: scaleX(1); }
+
+/* Footer link underline-draw (same technique as .nav__link) */
+.footer__col a { position: relative; }
+.footer__col a span { position: relative; display: inline-block; }
+.footer__col a span::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.45s var(--ease-out);
+}
+.footer__col a:hover span::after { transform: scaleX(1); }
+
+@media (max-width: 620px) {
+  .page-hero__meta { flex-direction: column; align-items: flex-start; gap: 0.75rem; }
 }

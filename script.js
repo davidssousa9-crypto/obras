@@ -258,11 +258,61 @@
     }
   }
 
+  /* ---------- Page-load curtain ---------- */
+  function initPageLoad() {
+    var curtain = document.querySelector('[data-curtain]');
+    if (!curtain) return;
+    if (!hasGSAP || reduced) return; // CSS keeps it display:none when GSAP is gone / motion reduced
+    gsap.set(curtain, { display: 'block' });
+    gsap.to(curtain, {
+      yPercent: -100,
+      duration: 1.0,
+      ease: 'power4.inOut',
+      onComplete: function () { gsap.set(curtain, { display: 'none' }); }
+    });
+  }
+
+  /* ---------- Active nav state ---------- */
+  function initActiveNav() {
+    var page = document.body && document.body.dataset ? document.body.dataset.page : '';
+    if (!page) return;
+    document.querySelectorAll('[data-nav]').forEach(function (el) {
+      if (el.getAttribute('data-nav') === page) el.classList.add('is-active');
+    });
+  }
+
+  /* ---------- Footer entrance + watermark parallax ---------- */
+  function initFooter() {
+    if (!hasGSAP || reduced) return;
+    var footer = document.querySelector('.footer');
+    if (!footer) return;
+
+    var cols = footer.querySelector('.footer__cols');
+    var children = cols ? Array.prototype.slice.call(cols.children) : [];
+    if (children.length) {
+      gsap.fromTo(children, { y: 36, autoAlpha: 0 }, {
+        y: 0, autoAlpha: 1, duration: 0.9, ease: 'power3.out', stagger: 0.08,
+        scrollTrigger: { trigger: cols, start: 'top 85%', once: true }
+      });
+    }
+
+    var watermark = footer.querySelector('.footer__watermark');
+    if (watermark) {
+      gsap.fromTo(watermark, { yPercent: 18 }, {
+        yPercent: -18, ease: 'none',
+        scrollTrigger: { trigger: footer, start: 'top bottom', end: 'bottom top', scrub: true }
+      });
+    }
+  }
+
   /* ---------- Boot ---------- */
+  initPageLoad(); // curtain up while the hero lines rise
   initReveals();
+  initActiveNav();
   initMagnetic();
   initServices();
   initQuotes();
+  initFooter();
   if (!hasGSAP || reduced) setCountersFinal();
 
   // Re-measure once assets settle
