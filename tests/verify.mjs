@@ -575,6 +575,54 @@ export async function anchorsResolve(ctx) {
   }
 }
 
+/**
+ * roleRowsPost — the careers page lists exactly six `.role` rows, each an
+ * anchor href starting `mailto:hello@metriccivil.ca` and carrying a subject
+ * query, and each built from the expected role parts. Fails before the roles
+ * land / if any row is missing or miswired.
+ */
+export async function roleRowsPost(ctx) {
+  const page = await ctx.openPage();
+  try {
+    await page.goto(ctx.url, { waitUntil: 'load', timeout: 30000 });
+    await page.waitForTimeout(250);
+    const r = await page.evaluate(() => {
+      const rows = Array.from(document.querySelectorAll('.role'));
+      return {
+        count: rows.length,
+        rows: rows.map((el) => {
+          const href = el.getAttribute('href') || '';
+          return {
+            tag: el.tagName,
+            href: href,
+            mailto: href.indexOf('mailto:hello@metriccivil.ca') === 0,
+            subject: /[?&]subject=/.test(href),
+            title: !!el.querySelector('.role__title'),
+            meta: !!el.querySelector('.role__meta'),
+            blurb: !!el.querySelector('.role__blurb'),
+            arrow: !!el.querySelector('.role__arrow'),
+          };
+        }),
+      };
+    });
+
+    const failures = [];
+    if (r.count !== 6) failures.push(`expected exactly 6 .role rows, got ${r.count}`);
+    r.rows.forEach((row, i) => {
+      if (row.tag !== 'A') failures.push(`.role[${i}] is <${row.tag.toLowerCase()}>, expected <a>`);
+      if (!row.mailto) failures.push(`.role[${i}] href "${row.href}" does not start mailto:hello@metriccivil.ca`);
+      if (!row.subject) failures.push(`.role[${i}] href "${row.href}" has no subject query`);
+      if (!row.title) failures.push(`.role[${i}] missing .role__title`);
+      if (!row.meta) failures.push(`.role[${i}] missing .role__meta`);
+      if (!row.blurb) failures.push(`.role[${i}] missing .role__blurb`);
+      if (!row.arrow) failures.push(`.role[${i}] missing .role__arrow`);
+    });
+    if (failures.length) throw new Error(failures.join('; '));
+  } finally {
+    await page.close();
+  }
+}
+
 /* ------------------------- per-page check registry ------------------------- */
 
 /**
@@ -604,6 +652,7 @@ PAGE_CHECKS['index'] = [
 ];
 PAGE_CHECKS['about'] = [...SHELL_CHECKS];
 PAGE_CHECKS['services'] = [...SHELL_CHECKS, anchorsResolve];
+PAGE_CHECKS['careers'] = [...SHELL_CHECKS, roleRowsPost];
 
 /* ------------------------- runner ------------------------- */
 

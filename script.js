@@ -374,6 +374,23 @@
     });
   }
 
+  /* ---------- Roles (careers) — row entrance ---------- */
+  // The six .role rows rise as a group on the section-head trigger. Rows are
+  // anchors; we tween transform/opacity only (no layout). one-way (once:true)
+  // so the entrance never replays on scroll-back.
+  function initRoleEntrance() {
+    if (!hasGSAP || reduced) return;
+    var rows = gsap.utils.toArray('.role');
+    if (!rows.length) return;
+    var trigger = document.querySelector('.roles .section-head');
+    if (!trigger) return;
+
+    gsap.fromTo(rows, { y: 28, autoAlpha: 0 }, {
+      y: 0, autoAlpha: 1, duration: 0.8, ease: 'power3.out', stagger: 0.07,
+      scrollTrigger: { trigger: trigger, start: 'top 85%', once: true }
+    });
+  }
+
   /* ---------- Boot ---------- */
   initPageLoad(); // curtain up while the hero lines rise
   initReveals();
@@ -381,6 +398,7 @@
   initSrvEntrance();
   initProjectParallax();
   initQuotesReveal();
+  initRoleEntrance();
   initActiveNav();
   initMagnetic();
   initServices();

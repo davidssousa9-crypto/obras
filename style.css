@@ -1339,3 +1339,164 @@ html.lenis, html.lenis body { height: auto; }
   .process__item { grid-template-columns: 1fr; gap: 0.5rem; }
   .svc-cta__foot { flex-direction: column; align-items: flex-start; }
 }
+
+/* ---------- 21. CAREERS ---------- */
+
+/* Story — paper band: heading + lede + pull stat */
+.careers-story { padding-block: var(--section-y); }
+.careers-story__grid {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: clamp(1.5rem, 4vw, 3rem);
+  align-items: end;
+}
+.careers-story__title {
+  grid-column: 1 / 8;
+  font-size: clamp(1.9rem, 5.4vw, 5.2rem);
+}
+.careers-story__lede {
+  grid-column: 8 / 13;
+  align-self: end;
+  font-size: clamp(0.98rem, 1.3vw, 1.1rem);
+  line-height: 1.7;
+  color: var(--fg-muted);
+}
+.careers-story__pull {
+  display: flex;
+  align-items: baseline;
+  gap: clamp(1.25rem, 3vw, 3rem);
+  margin-top: clamp(2.5rem, 5vw, 4.5rem);
+  padding-top: clamp(1.25rem, 2.5vw, 2rem);
+  border-top: 1px solid var(--line);
+}
+.careers-story__pull-value {
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 120, "wght" 840;
+  font-size: clamp(3rem, 9vw, 8rem);
+  line-height: 0.85;
+  letter-spacing: -0.02em;
+  color: var(--accent);
+  white-space: nowrap;
+}
+.careers-story__pull-label {
+  max-width: 36ch;
+  font-size: clamp(0.95rem, 1.2vw, 1.05rem);
+  line-height: 1.5;
+  color: var(--fg-muted);
+}
+
+/* Benefits — ink band, reuses .focus grid */
+.careers-benefits {
+  background: var(--ink);
+  padding-block: var(--section-y);
+}
+
+/* Roles — ink band, mailto rows */
+.roles {
+  background: var(--ink);
+  padding-block: var(--section-y);
+  border-top: 1px solid var(--line);
+}
+.roles__list { border-top: 1px solid var(--line); }
+.role {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(1rem, 3vw, 3rem);
+  padding: clamp(1.5rem, 3vw, 2.5rem) clamp(0.75rem, 2vw, 1.75rem);
+  border-bottom: 1px solid var(--line);
+  color: var(--fg);
+  transition: background-color 0.5s var(--ease-out), color 0.4s ease;
+}
+.role__body { display: block; min-width: 0; }
+.role__title {
+  display: block;
+  font-family: var(--font-display);
+  font-variation-settings: "wdth" 120, "wght" 820;
+  text-transform: uppercase;
+  font-size: clamp(1.4rem, 3.6vw, 2.9rem);
+  line-height: 0.95;
+  letter-spacing: -0.01em;
+  transition: transform 0.6s var(--ease-out), color 0.4s ease;
+}
+.role__meta {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.role__blurb {
+  display: block;
+  margin-top: 0.7rem;
+  max-width: 58ch;
+  font-size: clamp(0.9rem, 1.15vw, 1rem);
+  line-height: 1.6;
+  color: var(--fg-muted);
+  transition: color 0.4s ease;
+}
+.role__arrow {
+  font-size: clamp(1.3rem, 2.2vw, 1.9rem);
+  color: var(--fg-muted);
+  transition: transform 0.5s var(--ease-out), color 0.4s ease;
+}
+
+/* Role hover — row flips to paper, title nudges, arrow pops (CSS only) */
+.role:hover {
+  background: var(--paper);
+  color: var(--ink);
+}
+.role:hover .role__title { color: var(--ink); transform: translateX(clamp(0.5rem, 1.4vw, 1.25rem)); }
+.role:hover .role__meta { color: var(--ink); }
+.role:hover .role__blurb { color: rgba(11, 11, 11, 0.62); }
+.role:hover .role__arrow { color: var(--accent); transform: translate(6px, -6px); }
+
+/* CTA — footer-top style, ink band */
+.careers-cta {
+  background: var(--ink);
+  padding-top: var(--section-y);
+  padding-bottom: clamp(3rem, 7vw, 6rem);
+}
+.careers-cta__inner { border-bottom: 1px solid var(--line); }
+.careers-cta__title {
+  margin-top: clamp(1.25rem, 3vw, 2rem);
+  font-size: clamp(2.1rem, 7.6vw, 7.25rem);
+  font-variation-settings: "wdth" 124, "wght" 840;
+}
+.careers-cta__foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 2rem;
+  margin-top: clamp(2rem, 5vw, 3.5rem);
+}
+.careers-cta__foot p {
+  max-width: 44ch;
+  font-size: clamp(1rem, 1.3vw, 1.12rem);
+  line-height: 1.6;
+  color: var(--fg-muted);
+}
+
+/* Careers responsive */
+@media (max-width: 900px) {
+  .careers-story__grid { grid-template-columns: 1fr; }
+  .careers-story__title { grid-column: auto; }
+  .careers-story__lede { grid-column: auto; }
+}
+
+@media (max-width: 620px) {
+  .careers-story__pull { flex-direction: column; align-items: flex-start; }
+  .careers-cta__foot { flex-direction: column; align-items: flex-start; }
+  .role { padding-inline: 0; }
+}
+
+/* touch devices: arrow is hidden and the hover shift is inert */
+@media (hover: none) {
+  .role__arrow { display: none; }
+  .role:hover { background: transparent; }
+  .role:hover .role__title { transform: none; }
+  .role:hover .role__blurb { color: var(--fg-muted); }
+}
