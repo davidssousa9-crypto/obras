@@ -1,0 +1,96 @@
+- generic [active] [ref=e1]:
+  - banner [ref=e4]:
+    - link "Metric Civil — home" [ref=e5] [cursor=pointer]:
+      - /url: "#top"
+      - text: METRIC.
+    - navigation "Primary" [ref=e6]:
+      - list [ref=e7]:
+        - listitem [ref=e8]:
+          - link "About" [ref=e9] [cursor=pointer]:
+            - /url: about.html
+        - listitem [ref=e11]:
+          - link "Services" [ref=e12] [cursor=pointer]:
+            - /url: services.html
+        - listitem [ref=e14]:
+          - link "Projects" [ref=e15] [cursor=pointer]:
+            - /url: projects.html
+        - listitem [ref=e17]:
+          - link "Careers" [ref=e18] [cursor=pointer]:
+            - /url: careers.html
+        - listitem [ref=e20]:
+          - link "News" [ref=e21] [cursor=pointer]:
+            - /url: news.html
+        - listitem [ref=e23]:
+          - link "Contact" [ref=e24] [cursor=pointer]:
+            - /url: contact.html
+    - link "Start a project" [ref=e26] [cursor=pointer]:
+      - /url: "#contact"
+      - generic [aria-hidden] [ref=e28]: ↗
+  - main [ref=e29]:
+    - generic [ref=e34]:
+      - paragraph [ref=e35]: Heavy Civil & Infrastructure
+      - heading "We are the ground breakers." [level=1] [ref=e36]:
+        - generic [ref=e37]: We are the
+        - generic [ref=e39]: ground
+        - generic [ref=e41]: breakers.
+      - link "Explore our work" [ref=e44] [cursor=pointer]:
+        - /url: "#projects"
+        - generic [aria-hidden] [ref=e46]: ↗
+    - region "Trusted by" [ref=e48]:
+      - paragraph [ref=e49]: Trusted by owners, municipalities & general contractors
+      - generic [ref=e51]:
+        - list [ref=e52]:
+          - listitem [ref=e53]: Northcore ◆
+          - listitem [ref=e54]: Helix ◆
+          - listitem [ref=e55]: Granite Ridge ◆
+          - listitem [ref=e56]: Civicon ◆
+          - listitem [ref=e57]: Meridian ◆
+          - listitem [ref=e58]: Ironline ◆
+          - listitem [ref=e59]: Axiom ◆
+          - listitem [ref=e60]: Stonebridge ◆
+        - list [aria-hidden] [ref=e61]:
+          - listitem [ref=e62]: Northcore ◆
+          - listitem [ref=e63]: Helix ◆
+          - listitem [ref=e64]: Granite Ridge ◆
+          - listitem [ref=e65]: Civicon ◆
+          - listitem [ref=e66]: Meridian ◆
+          - listitem [ref=e67]: Ironline ◆
+          - listitem [ref=e68]: Axiom ◆
+          - listitem [ref=e69]: Stonebridge ◆
+    - generic [ref=e71]:
+      - heading "What defines METRIC isn't just the work we do. It's the way we do it." [level=2] [ref=e74]:
+        - generic [ref=e75]: What defines
+        - generic [ref=e77]: METRIC isn't just
+        - generic [ref=e79]: the work we do.
+        - emphasis [ref=e83]: It's the way
+        - emphasis [ref=e86]: we do it.
+      - list [ref=e88]
+    - list [ref=e94]
+    - figure "Project Director · Northgate Interchange" [ref=e100]:
+      - blockquote [ref=e101]: Metric moved 1.2 million cubic metres on the interchange without a single lost-time incident. Their pre-planning is the best we've seen in thirty years.
+  - contentinfo [ref=e103]:
+    - generic [ref=e104]:
+      - heading "The career your future self will thank you." [level=2] [ref=e106]:
+        - generic [ref=e107]: The career your
+        - generic [ref=e109]: future self will
+        - generic [ref=e111]: thank you.
+      - generic [aria-hidden] [ref=e114]: METRIC.
+      - generic [ref=e115]:
+        - generic [ref=e116]: © 2026 Metric Civil Ltd. All rights reserved.
+        - navigation "Legal" [ref=e117]:
+          - link "Privacy" [ref=e118] [cursor=pointer]:
+            - /url: "#"
+          - link "Terms" [ref=e119] [cursor=pointer]:
+            - /url: "#"
+          - link "Accessibility" [ref=e120] [cursor=pointer]:
+            - /url: "#"
+        - navigation "Social" [ref=e121]:
+          - link "LinkedIn" [ref=e122] [cursor=pointer]:
+            - /url: "#"
+            - text: Li
+          - link "Instagram" [ref=e123] [cursor=pointer]:
+            - /url: "#"
+            - text: Ig
+          - link "YouTube" [ref=e124] [cursor=pointer]:
+            - /url: "#"
+            - text: Yt

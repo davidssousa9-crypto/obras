@@ -1,0 +1,121 @@
+- generic [active] [ref=f1e1]:
+  - banner [ref=f1e4]:
+    - link "Metric Civil — home" [ref=f1e5] [cursor=pointer]:
+      - /url: "#top"
+      - text: METRIC.
+    - navigation "Primary" [ref=f1e6]:
+      - list [ref=f1e7]:
+        - listitem [ref=f1e8]:
+          - link "About" [ref=f1e9] [cursor=pointer]:
+            - /url: about.html
+        - listitem [ref=f1e11]:
+          - link "Services" [ref=f1e12] [cursor=pointer]:
+            - /url: services.html
+        - listitem [ref=f1e14]:
+          - link "Projects" [ref=f1e15] [cursor=pointer]:
+            - /url: projects.html
+        - listitem [ref=f1e17]:
+          - link "Careers" [ref=f1e18] [cursor=pointer]:
+            - /url: careers.html
+        - listitem [ref=f1e20]:
+          - link "News" [ref=f1e21] [cursor=pointer]:
+            - /url: news.html
+        - listitem [ref=f1e23]:
+          - link "Contact" [ref=f1e24] [cursor=pointer]:
+            - /url: contact.html
+    - link "Start a project" [ref=f1e26] [cursor=pointer]:
+      - /url: "#contact"
+      - generic [aria-hidden] [ref=f1e28]: ↗
+  - main [ref=f1e29]:
+    - generic [ref=f1e34]:
+      - paragraph [ref=f1e35]: Heavy Civil & Infrastructure
+      - heading "We are the ground breakers." [level=1] [ref=f1e36]:
+        - generic [ref=f1e37]: We are the
+        - generic [ref=f1e39]: ground
+        - generic [ref=f1e41]: breakers.
+      - link "Explore our work" [ref=f1e44] [cursor=pointer]:
+        - /url: "#projects"
+        - generic [aria-hidden] [ref=f1e46]: ↗
+    - region "Trusted by" [ref=f1e48]:
+      - paragraph [ref=f1e49]: Trusted by owners, municipalities & general contractors
+      - generic [ref=f1e51]:
+        - list [ref=f1e52]:
+          - listitem [ref=f1e53]: Northcore ◆
+          - listitem [ref=f1e54]: Helix ◆
+          - listitem [ref=f1e55]: Granite Ridge ◆
+          - listitem [ref=f1e56]: Civicon ◆
+          - listitem [ref=f1e57]: Meridian ◆
+          - listitem [ref=f1e58]: Ironline ◆
+          - listitem [ref=f1e59]: Axiom ◆
+          - listitem [ref=f1e60]: Stonebridge ◆
+        - list [aria-hidden] [ref=f1e61]:
+          - listitem [ref=f1e62]: Northcore ◆
+          - listitem [ref=f1e63]: Helix ◆
+          - listitem [ref=f1e64]: Granite Ridge ◆
+          - listitem [ref=f1e65]: Civicon ◆
+          - listitem [ref=f1e66]: Meridian ◆
+          - listitem [ref=f1e67]: Ironline ◆
+          - listitem [ref=f1e68]: Axiom ◆
+          - listitem [ref=f1e69]: Stonebridge ◆
+    - generic [ref=f1e71]:
+      - heading "What defines METRIC isn't just the work we do. It's the way we do it." [level=2] [ref=f1e74]:
+        - generic [ref=f1e76]:
+          - generic [ref=f1e77]: What
+          - generic [ref=f1e79]: defines
+        - generic [ref=f1e82]:
+          - generic [ref=f1e83]: METRIC
+          - generic [ref=f1e85]: isn't
+          - generic [ref=f1e87]: just
+        - generic [ref=f1e90]:
+          - generic [ref=f1e91]: the
+          - generic [ref=f1e93]: work
+          - generic [ref=f1e95]: we
+          - generic [ref=f1e97]: do.
+        - emphasis [ref=f1e101]:
+          - generic [ref=f1e102]: It's
+          - generic [ref=f1e104]: the
+          - generic [ref=f1e106]: way
+        - emphasis [ref=f1e110]:
+          - generic [ref=f1e111]: we
+          - generic [ref=f1e113]: do
+          - generic [ref=f1e115]: it.
+      - list [ref=f1e118]
+    - complementary [ref=f1e121]
+    - list [ref=f1e128]
+    - figure "Project Director · Northgate Interchange" [ref=f1e134]:
+      - blockquote [ref=f1e135]: Metric moved 1.2 million cubic metres on the interchange without a single lost-time incident. Their pre-planning is the best we've seen in thirty years.
+  - contentinfo [ref=f1e137]:
+    - generic [ref=f1e138]:
+      - heading "The career your future self will thank you ." [level=2] [ref=f1e140]:
+        - generic [ref=f1e142]:
+          - generic [ref=f1e143]: The
+          - generic [ref=f1e145]: career
+          - generic [ref=f1e147]: your
+        - generic [ref=f1e150]:
+          - generic [ref=f1e151]: future
+          - generic [ref=f1e153]: self
+          - generic [ref=f1e155]: will
+        - generic [ref=f1e158]:
+          - generic [ref=f1e159]: thank
+          - generic [ref=f1e161]: you
+          - generic [ref=f1e163]: .
+      - generic [aria-hidden] [ref=f1e167]: METRIC.
+      - generic [ref=f1e168]:
+        - generic [ref=f1e169]: © 2026 Metric Civil Ltd. All rights reserved.
+        - navigation "Legal" [ref=f1e170]:
+          - link "Privacy" [ref=f1e171] [cursor=pointer]:
+            - /url: "#"
+          - link "Terms" [ref=f1e172] [cursor=pointer]:
+            - /url: "#"
+          - link "Accessibility" [ref=f1e173] [cursor=pointer]:
+            - /url: "#"
+        - navigation "Social" [ref=f1e174]:
+          - link "LinkedIn" [ref=f1e175] [cursor=pointer]:
+            - /url: "#"
+            - text: Li
+          - link "Instagram" [ref=f1e176] [cursor=pointer]:
+            - /url: "#"
+            - text: Ig
+          - link "YouTube" [ref=f1e177] [cursor=pointer]:
+            - /url: "#"
+            - text: Yt

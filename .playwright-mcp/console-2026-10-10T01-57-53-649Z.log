@@ -1,0 +1,15 @@
+[   56822ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js:0
+[   56822ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js:0
+[   56822ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://unpkg.com/lenis@1.1.14/dist/lenis.min.js:0
+[  210656ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js:0
+[  210656ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js:0
+[  210656ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://unpkg.com/lenis@1.1.14/dist/lenis.min.js:0
+[  213013ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js:0
+[  213013ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js:0
+[  213013ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://unpkg.com/lenis@1.1.14/dist/lenis.min.js:0
+[  230153ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js:0
+[  230156ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js:0
+[  230157ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://unpkg.com/lenis@1.1.14/dist/lenis.min.js:0
+[  243190ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js:0
+[  243190ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js:0
+[  243191ms] [ERROR] Failed to load resource: net::ERR_FAILED @ https://unpkg.com/lenis@1.1.14/dist/lenis.min.js:0

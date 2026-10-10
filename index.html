@@ -188,14 +188,22 @@
 
     <!-- ============ SERVICES ============ -->
     <section class="services" id="services" data-services>
-      <div class="container">
-        <div class="section-head" data-fade>
-          <p class="label">What we do — 02</p>
-          <span class="section-head__index">[ 01 / 04 ]</span>
-        </div>
+      <div class="container services__grid">
+        <aside class="services__aside">
+          <div class="section-head" data-fade>
+            <p class="label">What we do — 02</p>
+            <span class="section-head__index" data-service-index>[ 01 / 04 ]</span>
+          </div>
+
+          <div class="services__preview" aria-hidden="true">
+            <img data-service-media src="https://images.unsplash.com/photo-1711618734250-ad5951b1f17d?auto=format&fit=crop&w=900&q=75" alt="" loading="lazy" />
+          </div>
+
+          <span class="services__progress" aria-hidden="true"><span class="services__progress-bar" data-service-bar></span></span>
+        </aside>
 
         <div class="services__list">
-          <article class="srv" data-srv data-img="https://images.unsplash.com/photo-1711618734250-ad5951b1f17d?auto=format&fit=crop&w=1200&q=80">
+          <article class="srv is-active" data-srv>
             <span class="srv__index">01</span>
             <div class="srv__body">
               <h3 class="srv__title">Earthworks</h3>
@@ -207,7 +215,7 @@
             <span class="srv__arrow" aria-hidden="true">↗</span>
           </article>
 
-          <article class="srv" data-srv data-img="https://images.unsplash.com/photo-1638207849658-e57be0cdc208?auto=format&fit=crop&w=1200&q=80">
+          <article class="srv" data-srv>
             <span class="srv__index">02</span>
             <div class="srv__body">
               <h3 class="srv__title">Utilities</h3>
@@ -219,7 +227,7 @@
             <span class="srv__arrow" aria-hidden="true">↗</span>
           </article>
 
-          <article class="srv" data-srv data-img="https://images.unsplash.com/photo-1757030689705-1eecc41d221a?auto=format&fit=crop&w=1200&q=80">
+          <article class="srv" data-srv>
             <span class="srv__index">03</span>
             <div class="srv__body">
               <h3 class="srv__title">Roadworks</h3>
@@ -231,7 +239,7 @@
             <span class="srv__arrow" aria-hidden="true">↗</span>
           </article>
 
-          <article class="srv" data-srv data-img="https://images.unsplash.com/photo-1746099053648-937914357115?auto=format&fit=crop&w=1200&q=80">
+          <article class="srv" data-srv>
             <span class="srv__index">04</span>
             <div class="srv__body">
               <h3 class="srv__title">Environmental</h3>
@@ -243,10 +251,6 @@
             <span class="srv__arrow" aria-hidden="true">↗</span>
           </article>
         </div>
-      </div>
-
-      <div class="services__float" data-float aria-hidden="true">
-        <img src="https://images.unsplash.com/photo-1711618734250-ad5951b1f17d?auto=format&fit=crop&w=1200&q=80" alt="" data-float-img />
       </div>
     </section>
 

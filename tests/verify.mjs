@@ -437,6 +437,61 @@ export async function srvEntranceOnce(ctx) {
 }
 
 /**
+ * servicesPinAndSplit — home only. The `[data-split]` titles must be split
+ * into `.word__in` spans (word-level masked reveal ran), and the sticky
+ * services aside must track the active row: scrolling a middle row to centre
+ * flips `.is-active` to it and updates the aside index + preview image.
+ */
+export async function servicesPinAndSplit(ctx) {
+  const page = await ctx.openPage();
+  try {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(ctx.url, { waitUntil: 'load', timeout: 30000 });
+    await page.waitForTimeout(1600);
+
+    const split = await page.evaluate(() => {
+      const title = document.querySelector('[data-split]');
+      if (!title) return { title: false, words: 0 };
+      return { title: true, words: title.querySelectorAll('.word__in').length };
+    });
+    if (!split.title) throw new Error('[data-split] title not found');
+    if (split.words < 2) throw new Error(`text split did not run: ${split.words} word(s)`);
+
+    const mid = await page.evaluate(async () => {
+      const rows = Array.from(document.querySelectorAll('[data-srv]'));
+      if (rows.length < 2) return { rows: rows.length };
+      const row = rows[1];
+      const rect = row.getBoundingClientRect();
+      const y = window.scrollY + rect.top + rect.height / 2 - window.innerHeight / 2;
+      if (window.__lenis && window.__lenis.scrollTo) window.__lenis.scrollTo(y, { immediate: true });
+      else window.scrollTo(0, y);
+      await new Promise((r) => setTimeout(r, 800));
+      if (window.ScrollTrigger && window.ScrollTrigger.update) window.ScrollTrigger.update();
+
+      const active = rows.findIndex((r) => r.classList.contains('is-active'));
+      const index = document.querySelector('[data-service-index]');
+      const media = document.querySelector('[data-service-media]');
+      const rowImg = row.querySelector('.srv__thumb img');
+      return {
+        rows: rows.length,
+        active,
+        indexText: index ? index.textContent.trim() : '',
+        mediaMatches: !!(media && rowImg && media.getAttribute('src') === rowImg.getAttribute('src')),
+      };
+    });
+
+    const failures = [];
+    if (mid.rows < 2) throw new Error('needs at least two [data-srv] rows');
+    if (mid.active !== 1) failures.push(`active row=${mid.active} (expected 1)`);
+    if (!/02/.test(mid.indexText)) failures.push(`aside index "${mid.indexText}"`);
+    if (!mid.mediaMatches) failures.push('aside preview did not swap to active row');
+    if (failures.length) throw new Error(failures.join('; '));
+  } finally {
+    await page.close();
+  }
+}
+
+/**
  * projectParallax — each `[data-project] [data-parallax]` wraps its img in an
  * overflow-hidden scrub: after scrolling so the card passes the viewport top
  * the img carries an inline transform with a non-zero translateY. Under
@@ -623,6 +678,138 @@ export async function roleRowsPost(ctx) {
   }
 }
 
+/* ------------------------- projects checks ------------------------- */
+
+/**
+ * filterWorks — the shared filter protocol. Clicking a sector button hides
+ * every `.project` whose `data-filter-item` lacks that sector (visibility via
+ * `display`), sets `.is-active` + `aria-pressed="true"` on the clicked button
+ * only, and clicking `all` restores every card. Fails before
+ * `initFilterButtons` lands / before the filter markup exists.
+ */
+export async function filterWorks(ctx) {
+  const page = await ctx.openPage();
+  try {
+    await page.goto(ctx.url, { waitUntil: 'load', timeout: 30000 });
+    await page.waitForTimeout(400);
+
+    const present = await page.evaluate(() => ({
+      root: !!document.querySelector('[data-filter-root]'),
+      btns: document.querySelectorAll('[data-filter]').length,
+      items: document.querySelectorAll('.project[data-filter-item]').length,
+    }));
+    if (!present.root) throw new Error('[data-filter-root] not found');
+    if (present.btns < 2) throw new Error(`expected filter buttons, found ${present.btns}`);
+    if (!present.items) throw new Error('expected .project[data-filter-item] cards, found none');
+
+    // Prefer `utilities` (brief example); otherwise the first non-`all` button.
+    const clicked = await page.evaluate(() => {
+      const btn =
+        document.querySelector('[data-filter="utilities"]') ||
+        Array.from(document.querySelectorAll('[data-filter]')).find(
+          (b) => b.getAttribute('data-filter') && b.getAttribute('data-filter') !== 'all'
+        );
+      if (!btn) return null;
+      const mode = btn.getAttribute('data-filter');
+      btn.click();
+      const reports = Array.from(document.querySelectorAll('[data-filter]')).map((b) => ({
+        mode: b.getAttribute('data-filter'),
+        pressed: b.getAttribute('aria-pressed'),
+        active: b.classList.contains('is-active'),
+      }));
+      const items = Array.from(document.querySelectorAll('.project[data-filter-item]')).map((el) => ({
+        cats: (el.getAttribute('data-filter-item') || '').split(' '),
+        hidden: el.classList.contains('is-hidden'),
+        display: getComputedStyle(el).display,
+      }));
+      return { mode, reports, items };
+    });
+    if (!clicked) throw new Error('no non-`all` [data-filter] button found');
+
+    const failures = [];
+    const hidden = clicked.items.filter((i) => i.display === 'none');
+    const visible = clicked.items.filter((i) => i.display !== 'none');
+    if (!hidden.length) failures.push(`filter "${clicked.mode}": no card hidden (>=1 expected)`);
+    visible.forEach((i) => {
+      if (i.cats.indexOf(clicked.mode) === -1) {
+        failures.push(
+          `visible card lacks sector "${clicked.mode}" in data-filter-item="${i.cats.join(' ')}"`
+        );
+      }
+    });
+    clicked.reports.forEach((r) => {
+      const shouldBe = r.mode === clicked.mode;
+      if ((r.pressed === 'true') !== shouldBe) {
+        failures.push(`aria-pressed on "${r.mode}" is "${r.pressed}", expected "${shouldBe}"`);
+      }
+      if (r.active !== shouldBe) {
+        failures.push(`.is-active on "${r.mode}" is ${r.active}, expected ${shouldBe}`);
+      }
+    });
+
+    const allState = await page.evaluate(() => {
+      const all = Array.from(document.querySelectorAll('[data-filter]')).find(
+        (b) => b.getAttribute('data-filter') === 'all'
+      );
+      if (!all) return null;
+      all.click();
+      const items = Array.from(document.querySelectorAll('.project[data-filter-item]'));
+      return {
+        hidden: items.filter((el) => el.classList.contains('is-hidden')).length,
+        visible: items.filter((el) => getComputedStyle(el).display !== 'none').length,
+        total: items.length,
+      };
+    });
+    if (!allState) failures.push('no [data-filter="all"] button found');
+    else {
+      if (allState.hidden !== 0) failures.push(`after "all": ${allState.hidden} card(s) still .is-hidden`);
+      if (allState.visible !== allState.total) {
+        failures.push(`after "all": ${allState.visible}/${allState.total} cards visible`);
+      }
+    }
+
+    if (failures.length) throw new Error(failures.join('; '));
+  } finally {
+    await page.close();
+  }
+}
+
+/**
+ * cardsLinkToDetail — every `.project` card is an anchor whose href matches
+ * `project.html?id=<slug>` and whose `data-slug` equals that id. Validates the
+ * forward-ref pattern only (project.html ships in a later task).
+ */
+export async function cardsLinkToDetail(ctx) {
+  const page = await ctx.openPage();
+  try {
+    await page.goto(ctx.url, { waitUntil: 'load', timeout: 30000 });
+    await page.waitForTimeout(300);
+    const r = await page.evaluate(() => {
+      const cards = Array.from(document.querySelectorAll('.project'));
+      return {
+        count: cards.length,
+        cards: cards.map((el) => ({
+          tag: el.tagName,
+          href: el.getAttribute('href') || '',
+          slug: el.getAttribute('data-slug') || '',
+        })),
+      };
+    });
+    const failures = [];
+    if (!r.count) failures.push('no .project cards found');
+    r.cards.forEach((c, i) => {
+      if (c.tag !== 'A') failures.push(`.project[${i}] is <${c.tag.toLowerCase()}>, expected <a>`);
+      const m = /^project\.html\?id=(.+)$/.exec(c.href);
+      if (!m) failures.push(`.project[${i}] href "${c.href}" does not match project.html?id=<slug>`);
+      else if (!c.slug) failures.push(`.project[${i}] missing data-slug`);
+      else if (c.slug !== m[1]) failures.push(`.project[${i}] data-slug "${c.slug}" != id "${m[1]}"`);
+    });
+    if (failures.length) throw new Error(failures.join('; '));
+  } finally {
+    await page.close();
+  }
+}
+
 /* ------------------------- per-page check registry ------------------------- */
 
 /**
@@ -647,12 +834,14 @@ PAGE_CHECKS['index'] = [
   ...SHELL_CHECKS,
   marqueeReactive,
   srvEntranceOnce,
+  servicesPinAndSplit,
   projectParallax,
   quotesStageEntrance,
 ];
 PAGE_CHECKS['about'] = [...SHELL_CHECKS];
 PAGE_CHECKS['services'] = [...SHELL_CHECKS, anchorsResolve];
 PAGE_CHECKS['careers'] = [...SHELL_CHECKS, roleRowsPost];
+PAGE_CHECKS['projects'] = [...SHELL_CHECKS, filterWorks, cardsLinkToDetail];
 
 /* ------------------------- runner ------------------------- */
 

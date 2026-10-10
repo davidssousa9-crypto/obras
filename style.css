@@ -148,6 +148,10 @@ html.lenis, html.lenis body { height: auto; }
 .mask { display: block; overflow: hidden; }
 .mask__in { display: block; will-change: transform; }
 
+/* word split (data-split titles) — words rise inside the line mask */
+.word { display: inline-block; }
+.word__in { display: inline-block; will-change: transform; }
+
 /* ---------- 4. BUTTONS ---------- */
 .btn {
   position: relative;
@@ -556,6 +560,40 @@ html.lenis, html.lenis body { height: auto; }
   background: var(--ink);
   padding-block: var(--section-y);
 }
+.services__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  gap: clamp(2rem, 5vw, 5rem);
+}
+.services__aside {
+  position: sticky;
+  top: clamp(6rem, 13vh, 8.5rem);
+  align-self: start;
+}
+.services__aside .section-head { margin-bottom: clamp(1.5rem, 3vw, 2.5rem); }
+.services__preview {
+  aspect-ratio: 4 / 5;
+  max-height: 56vh;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: rgba(244, 241, 234, 0.04);
+}
+.services__preview img { width: 100%; height: 100%; object-fit: cover; }
+.services__progress {
+  display: block;
+  margin-top: clamp(1.5rem, 3vw, 2.5rem);
+  height: 2px;
+  background: rgba(244, 241, 234, 0.14);
+  overflow: hidden;
+}
+.services__progress-bar {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  transform: scaleX(0.25);
+  transform-origin: left center;
+  transition: transform 0.5s var(--ease-out);
+}
 .services__list { border-top: 1px solid var(--line); }
 .srv {
   position: relative;
@@ -599,24 +637,12 @@ html.lenis, html.lenis body { height: auto; }
 .srv:hover .srv__title { transform: translateX(clamp(0.6rem, 1.6vw, 1.6rem)); }
 .srv:hover .srv__index { color: var(--accent); }
 .srv:hover .srv__arrow { color: var(--accent); transform: translate(6px, -6px); }
+.srv.is-active .srv__title { transform: translateX(clamp(0.6rem, 1.6vw, 1.6rem)); }
+.srv.is-active .srv__index { color: var(--accent); }
+.srv.is-active .srv__arrow { color: var(--accent); transform: translate(6px, -6px); }
 
 .srv__thumb { display: none; grid-column: 2 / 4; margin-top: 1.25rem; overflow: hidden; }
 .srv__thumb img { width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
-
-.services__float {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: clamp(260px, 30vw, 440px);
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 120;
-  opacity: 0;
-  border: 1px solid rgba(244, 241, 234, 0.22);
-  will-change: transform;
-}
-.services__float img { width: 100%; height: 100%; object-fit: cover; }
 
 /* ---------- 12. STATS ---------- */
 .stats { padding-block: var(--section-y); }
@@ -890,7 +916,8 @@ html.lenis, html.lenis body { height: auto; }
   .manifesto__title { grid-column: auto; }
   .manifesto__aside { grid-column: auto; }
 
-  .services__float { display: none; }
+  .services__grid { display: block; }
+  .services__aside { display: none; }
   .srv { display: block; }
   .srv__index { display: block; margin-bottom: 0.75rem; }
   .srv__title { font-size: clamp(2rem, 9vw, 3.25rem); }
@@ -898,6 +925,7 @@ html.lenis, html.lenis body { height: auto; }
   .srv__thumb { display: block; margin-top: 1.25rem; }
   .srv__arrow { display: none; }
   .srv:hover .srv__title { transform: none; }
+  .srv.is-active .srv__title { transform: none; }
 
   .projects__grid { grid-template-columns: 1fr; }
   .project--lg, .project--sm { grid-column: auto; }
@@ -1499,4 +1527,54 @@ html.lenis, html.lenis body { height: auto; }
   .role:hover { background: transparent; }
   .role:hover .role__title { transform: none; }
   .role:hover .role__blurb { color: var(--fg-muted); }
+}
+
+/* ---------- 22. PROJECTS PAGE ---------- */
+.projects-page {
+  background: var(--ink);
+  padding-top: clamp(2.5rem, 5vw, 4rem);
+  padding-bottom: var(--section-y);
+}
+
+/* Filter bar — pill buttons; scrolls horizontally on narrow screens */
+.filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.55rem;
+  margin-bottom: clamp(2.25rem, 4.5vw, 3.75rem);
+}
+.filter__btn {
+  border: 1px solid var(--line);
+  padding: 0.6rem 1.15rem;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--fg-muted);
+  background: transparent;
+  transition: background-color 0.4s var(--ease-out), color 0.4s ease, border-color 0.4s ease;
+}
+.filter__btn:hover { color: var(--fg); border-color: var(--fg-muted); }
+.filter__btn.is-active {
+  background: var(--bone);
+  color: var(--ink);
+  border-color: var(--bone);
+}
+.filter__btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+/* Cards are anchors here — block for grid frames; filtered via display only */
+.projects-page .project { display: block; }
+.project.is-hidden { display: none; }
+
+@media (max-width: 620px) {
+  .filter {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding-bottom: 0.4rem;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .filter::-webkit-scrollbar { display: none; }
+  .filter__btn { flex: 0 0 auto; white-space: nowrap; }
 }
