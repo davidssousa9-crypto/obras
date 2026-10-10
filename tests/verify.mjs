@@ -542,6 +542,39 @@ export async function quotesStageEntrance(ctx) {
   }
 }
 
+/**
+ * anchorsResolve — the services page owns four deep-link anchors
+ * (#earthworks | #utilities | #roadworks | #environmental) that the footer
+ * points at via services.html#<anchor>. Every `main a[href^="#"]` must
+ * resolve to an existing in-page element with that id, and all four section
+ * ids must be present. Fails before the ids land and if any in-page anchor
+ * dangles.
+ */
+export async function anchorsResolve(ctx) {
+  const page = await ctx.openPage();
+  try {
+    await page.goto(ctx.url, { waitUntil: 'load', timeout: 30000 });
+    const r = await page.evaluate(() => {
+      const required = ['earthworks', 'utilities', 'roadworks', 'environmental'];
+      const missing = required.filter((id) => !document.getElementById(id));
+      const orphans = [];
+      document.querySelectorAll('main a[href^="#"]').forEach((a) => {
+        const href = a.getAttribute('href');
+        if (href && href.length > 1 && !document.getElementById(href.slice(1))) {
+          orphans.push(href);
+        }
+      });
+      return { missing, orphans };
+    });
+    const failures = [];
+    if (r.missing.length) failures.push(`missing section id(s): ${r.missing.join(', ')}`);
+    if (r.orphans.length) failures.push(`unresolved in-page anchor(s): ${r.orphans.join(', ')}`);
+    if (failures.length) throw new Error(failures.join('; '));
+  } finally {
+    await page.close();
+  }
+}
+
 /* ------------------------- per-page check registry ------------------------- */
 
 /**
@@ -570,6 +603,7 @@ PAGE_CHECKS['index'] = [
   quotesStageEntrance,
 ];
 PAGE_CHECKS['about'] = [...SHELL_CHECKS];
+PAGE_CHECKS['services'] = [...SHELL_CHECKS, anchorsResolve];
 
 /* ------------------------- runner ------------------------- */
 
