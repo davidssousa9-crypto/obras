@@ -277,8 +277,9 @@ export async function curtainOnce(ctx) {
 /**
  * activeNavStated — runs for any page in the registry. Asserts the shell's
  * active-nav protocol: <body data-page> present, every [data-nav] link has a
- * non-empty data-nav value and an href ending in .html, exactly the links for
- * the current page carry .is-active, and home carries none.
+ * non-empty data-nav value and an href ending in .html, exactly ONE active
+ * link per nav context (.nav header and .menu mobile), every .is-active
+ * link's data-nav equals data-page, and home carries none.
  */
 export async function activeNavStated(ctx) {
   const page = await ctx.openPage();
@@ -288,24 +289,36 @@ export async function activeNavStated(ctx) {
     const r = await page.evaluate(() => {
       const body = document.body;
       const dataPage = (body && body.dataset ? body.dataset.page : '') || '';
-      const navs = Array.from(document.querySelectorAll('[data-nav]'));
+      const all = Array.from(document.querySelectorAll('[data-nav]'));
       const bad = [];
-      navs.forEach((el, i) => {
-        const v = el.getAttribute('data-nav');
-        const href = el.getAttribute('href') || '';
-        if (!v) bad.push('[data-nav][' + i + '] empty data-nav');
-        if (!/\.html$/.test(href)) bad.push('[data-nav][' + i + '] href "' + href + '" does not end in .html');
+      all.forEach((el, i) => {
+        if (!el.getAttribute('data-nav')) bad.push('[data-nav][' + i + '] empty data-nav');
+        if (!/\.html$/.test(el.getAttribute('href') || '')) {
+          bad.push('[data-nav][' + i + '] href "' + el.getAttribute('href') + '" does not end in .html');
+        }
       });
-      const active = navs.filter((el) => el.classList.contains('is-active'));
+      const active = all.filter((el) => el.classList.contains('is-active'));
+      const contexts = ['.nav', '.menu']
+        .map((sel) => {
+          const links = Array.from(document.querySelectorAll(sel + ' [data-nav]'));
+          return {
+            selector: sel,
+            count: links.length,
+            active: links
+              .filter((el) => el.classList.contains('is-active'))
+              .map((el) => el.getAttribute('data-nav') || ''),
+          };
+        })
+        .filter((c) => c.count > 0);
       return {
         dataPage: dataPage,
-        count: navs.length,
+        count: all.length,
         bad: bad,
-        activeCount: active.length,
-        activeMatching: active.filter((el) => el.getAttribute('data-nav') === dataPage).length,
+        activeTotal: active.length,
         activeWrong: active
           .filter((el) => el.getAttribute('data-nav') !== dataPage)
           .map((el) => el.getAttribute('data-nav')),
+        contexts: contexts,
       };
     });
 
@@ -314,10 +327,19 @@ export async function activeNavStated(ctx) {
     if (r.count === 0) failures.push('no [data-nav] links found');
     if (r.bad.length) failures.push(r.bad.join('; '));
     if (r.dataPage === 'home') {
-      if (r.activeCount !== 0) failures.push(`home: ${r.activeCount} active nav link(s), expected none`);
+      if (r.activeTotal !== 0) failures.push(`home: ${r.activeTotal} active nav link(s), expected none`);
     } else if (r.dataPage) {
-      if (r.activeMatching === 0) failures.push(`no active [data-nav] for data-page "${r.dataPage}"`);
+      for (const c of r.contexts) {
+        if (c.active.length !== 1) {
+          failures.push(`${c.selector}: expected exactly 1 active nav link, got ${c.active.length}`);
+        } else if (c.active[0] !== r.dataPage) {
+          failures.push(`${c.selector}: active data-nav "${c.active[0]}" does not match data-page "${r.dataPage}"`);
+        }
+      }
       if (r.activeWrong.length) failures.push(`non-matching active link(s): ${r.activeWrong.join(', ')}`);
+      if (r.activeTotal !== r.contexts.length) {
+        failures.push(`active total ${r.activeTotal} != ${r.contexts.length} nav context(s) with active links (one active link per context)`);
+      }
     }
     if (failures.length) throw new Error(failures.join('; '));
   } finally {
